@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Archivo de credenciales capturadas
+credenciales.xlsx
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

