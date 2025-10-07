@@ -1,0 +1,84 @@
+@import url('https://fonts.cdnfonts.com/css/billabong');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+}
+
+/* Color principal entre azul y violeta, usado en botones y links */
+:root {
+  --instagram-blue: #4f46e5; /* un poco más azul (indigo-600) */
+}
+
+.instagram-blue {
+  color: var(--instagram-blue);
+}
+
+.instagram-bg {
+  background-color: var(--instagram-blue);
+}
+
+.instagram-fill {
+  fill: var(--instagram-blue);
+}
+
+/* Footer: asegurar separación y color consistente entre enlaces */
+.footer-links a {
+  display: inline-block;
+  margin: 0 12px; /* separación horizontal */
+  color: #737373; /* mismo color que "Español" y el texto de copyright */
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline; /* si quieres hover, opcional */
+}
+
+/* Reglas más específicas para asegurar separación usando flex + gap */
+.footer-links ul {
+  display: flex;
+  flex-wrap: nowrap; /* por defecto en pantallas grandes */
+  gap: 12px; /* separación para items */
+  justify-content: space-between; /* distribuir uniformemente como en la segunda imagen */
+  width: 100%;
+  max-width: 1400px; /* limitar ancho para mantener diseño */
+  padding: 0;
+  margin: 0 auto;
+  list-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.footer-links li {
+  display: inline-block; /* fallback */
+  margin: 0; /* espacio controlado por justify-content */
+}
+
+/* Responsive: en pantallas <= 1024px permitimos wrap y ocultamos scroll */
+@media (max-width: 768px) {
+  .footer-links ul {
+    flex-wrap: wrap; /* permite varias líneas y quita la barra */
+    white-space: normal;
+    overflow-x: hidden;
+    gap: 10px;
+  }
+  .footer-links li {
+    margin: 0 10px 6px 0; /* espacio menor y separación vertical entre filas */
+  }
+}
+.footer-links li:last-child {
+  margin-right: 0;
+}
+
+/* Reducir tamaño de letra en la sección del footer */
+.footer-links a {
+  font-size: 13px; /* aumentado 2px */
+  line-height: 1.2;
+}
+
+.footer-bottom {
+  font-size: 13px;
+}
