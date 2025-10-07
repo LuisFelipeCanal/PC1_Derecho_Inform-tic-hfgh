@@ -1,2 +1,2 @@
-# PC1_Derecho_Inform-tic-hfgh
+# PC1_Derecho_Informatico
 Estas practicas son buenas para estudios
